@@ -56,7 +56,6 @@ import django.conf
 import django.dispatch
 import ldap
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, Permission
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.utils.inspect import func_supports_parameter
@@ -771,6 +770,7 @@ class _LDAPUser:
             )
 
         if target_group_names != current_group_names:
+            from django.contrib.auth.models import Group
             existing_groups = list(
                 Group.objects.filter(name__in=target_group_names).iterator()
             )
@@ -794,7 +794,7 @@ class _LDAPUser:
         Django group permissions.
         """
         group_names = self._get_groups().get_group_names()
-
+        from django.contrib.auth.models import Permission
         perms = Permission.objects.filter(group__name__in=group_names)
         perms = perms.values_list("content_type__app_label", "codename")
         perms = perms.order_by()
@@ -1064,3 +1064,14 @@ def valid_cache_key(key):
     Sanitizes a cache key for memcached.
     """
     return re.sub(r"\s+", "+", key)[:250]
+
+try:
+    from lino.modlib.users.choicelists import UserTypes
+except ImportError:
+    UserTypes = False
+def populate_user_profile(sender, user=None, ldap_user=None, **kwargs):
+    if UserTypes:
+        user.user_type = UserTypes.user
+    user.save()
+
+populate_user.connect(populate_user_profile)
