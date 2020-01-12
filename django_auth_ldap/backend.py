@@ -292,7 +292,7 @@ class _LDAPUser:
             raise Exception("Internal error: _LDAPUser improperly initialized.")
 
     def __deepcopy__(self, memo):
-        obj = object.__new__(self.__class__)
+        obj = object.__new__(type(self))
         obj.backend = self.backend
         obj._user = copy.deepcopy(self._user, memo)
 
@@ -356,7 +356,7 @@ class _LDAPUser:
             logger.debug("Authentication failed for {}: {}".format(self._username, e))
         except ldap.LDAPError as e:
             results = ldap_error.send(
-                self.backend.__class__,
+                type(self.backend),
                 context="authenticate",
                 user=self._user,
                 exception=e,
@@ -387,7 +387,7 @@ class _LDAPUser:
                         self._load_group_permissions()
                 except ldap.LDAPError as e:
                     results = ldap_error.send(
-                        self.backend.__class__,
+                        type(self.backend),
                         context="get_group_permissions",
                         user=self._user,
                         exception=e,
@@ -416,7 +416,7 @@ class _LDAPUser:
             user = self._user
         except ldap.LDAPError as e:
             results = ldap_error.send(
-                self.backend.__class__,
+                type(self.backend),
                 context="populate_user",
                 user=self._user,
                 exception=e,
@@ -623,7 +623,7 @@ class _LDAPUser:
 
             # Give the client a chance to finish populating the user just
             # before saving.
-            populate_user.send(self.backend.__class__, user=self._user, ldap_user=self)
+            populate_user.send(type(self.backend), user=self._user, ldap_user=self)
 
         if save_user:
             self._user.save()
@@ -985,7 +985,7 @@ class _LDAPUserGroups:
         """
         dn = self._ldap_user.dn
         return valid_cache_key(
-            "auth_ldap.{}.{}.{}".format(self.__class__.__name__, attr_name, dn)
+            "auth_ldap.{}.{}.{}".format(type(self).__name__, attr_name, dn)
         )
 
 

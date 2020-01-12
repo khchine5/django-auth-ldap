@@ -25,8 +25,8 @@ groups, and permissions.
 * Tests: http://travis-ci.org/django-auth-ldap/django-auth-ldap
 * License: BSD 2-Clause
 
-This version is supported on Python 2.7 and 3.4+; and Django 1.11+. It requires
-`python-ldap`_ >= 3.0.
+This version is supported on Python 3.5+; and Django 1.11+. It requires
+`python-ldap`_ >= 3.1.
 
 .. _`python-ldap`: https://pypi.org/project/python-ldap/
 
@@ -40,7 +40,7 @@ Install the package with pip:
 
     $ pip install django-auth-ldap
 
-It requires `python-ldap`_ >= 3.0. You'll need the `OpenLDAP`_ libraries and
+It requires `python-ldap`_ >= 3.1. You'll need the `OpenLDAP`_ libraries and
 headers available on your system.
 
 To use the auth backend in a Django project, add
@@ -135,7 +135,7 @@ settings and arguments are included for completeness.
     # Use LDAP group membership to calculate group permissions.
     AUTH_LDAP_FIND_GROUP_PERMS = True
 
-    # Cache distinguised names and group memberships for an hour to minimize
+    # Cache distinguished names and group memberships for an hour to minimize
     # LDAP traffic.
     AUTH_LDAP_CACHE_TIMEOUT = 3600
 
